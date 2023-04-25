@@ -1,12 +1,17 @@
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Depends
-from download.model import DownloadVideoDto
+
+from common import get_logger
+from convert.models import ConvertVideoDto
+from convert.video_convert import convert_video
+from download.models import DownloadVideoDto
 from download.video_download import download_video
 from resources import secret
 from search.video_search import search_videos
 
 app = FastAPI()
+logger = get_logger()
 
 
 async def check_apikey(
@@ -24,12 +29,28 @@ async def health_check():
     return {"message": "OK"}
 
 
-@app.post("/video/download", dependencies=[Depends(check_apikey)])
-async def play_streaming_video(download_video_dto: DownloadVideoDto):
-    download_video(youtube_url=download_video_dto.youtube_url)
-    return {"message": "success"}
-
-
 @app.get("/video/search", dependencies=[Depends(check_apikey)])
-async def search_video(query: str, rows: int = 10):
-    return {"message": "success", "data": search_videos(query, rows)}
+async def search(query: str, rows: int = 10):
+    try:
+        return {"message": "success", "data": search_videos(query, rows)}
+    except Exception as ex:
+        logger.error(ex)
+        return {"message": "error", "data": ""}
+
+
+@app.post("/video/download", dependencies=[Depends(check_apikey)])
+async def download(download_video_dto: DownloadVideoDto):
+    try:
+        return {"message": "success", "data": download_video(video_id=download_video_dto.video_id)}
+    except Exception as ex:
+        logger.error(ex)
+        return {"message": "error", "data": ""}
+
+
+@app.post("/video/convert", dependencies=[Depends(check_apikey)])
+async def convert(convert_video_dto: ConvertVideoDto):
+    try:
+        return {"message": "success", "data": convert_video(video_id=convert_video_dto.video_id)}
+    except Exception as ex:
+        logger.error(ex)
+        return {"message": "error", "data": ""}
