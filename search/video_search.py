@@ -7,6 +7,10 @@ logger = get_logger()
 
 
 def is_available_video(running_time):
+    # Live Video
+    if running_time is None:
+        return False
+
     i = 0
     run_sec = 0
     for sec in reversed(running_time.split(':')):
