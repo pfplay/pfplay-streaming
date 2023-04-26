@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import ffmpeg
 
@@ -17,6 +18,7 @@ def convert_video(video_id):
     if os.path.exists(output_dir):
         pass # skip
     else:
+        subprocess.run(f'mkdir -p {output_dir}', shell=True)
         input_stream = ffmpeg.input(input_file, f=INPUT_VIDEO_FORMAT)
         output_stream = ffmpeg.output(input_stream, output_file, format='hls',
                                       start_number=0, hls_time=5, hls_list_size=0)
