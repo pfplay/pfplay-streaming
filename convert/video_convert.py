@@ -14,7 +14,7 @@ def convert_video(video_id):
     input_file = f'{INPUT_VIDEO_DIRECTORY}/{video_id}.{INPUT_VIDEO_FORMAT}'
     output_file = f'{OUTPUT_VIDEO_DIRECTORY}/{video_id}/{video_id}.{OUTPUT_VIDEO_FORMAT}'
     output_dir = f'{OUTPUT_VIDEO_DIRECTORY}/{video_id}'
-    if os.exists(output_dir):
+    if os.path.exists(output_dir):
         pass # skip
     else:
         input_stream = ffmpeg.input(input_file, f=INPUT_VIDEO_FORMAT)
