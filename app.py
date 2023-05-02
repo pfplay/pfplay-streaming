@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Depends
+from starlette.middleware.cors import CORSMiddleware
 
 from common import get_logger
 from convert.models import ConvertVideoDto
@@ -11,6 +12,13 @@ from resources import secret
 from search.video_search import search_videos
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 logger = get_logger()
 
 
