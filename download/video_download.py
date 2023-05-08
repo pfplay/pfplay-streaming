@@ -11,7 +11,7 @@ logger = get_logger()
 
 
 def download_video(video_id):
-    youtube_url = f"{VIDEO_WATCH_URL_PREFIX}/{video_id}"
+    youtube_url = f"{VIDEO_WATCH_URL_PREFIX}{video_id}"
     output_video = f"{video_id}.{VIDEO_FILE_FORMAT}"
     try:
         yt = YouTube(youtube_url)
@@ -23,5 +23,6 @@ def download_video(video_id):
             .download(output_path=VIDEO_DOWNLOAD_DIRECTORY, filename=output_video)
     except Exception as ex:
         logger.error(f"failed to download video, video id: {video_id}, {ex}")
+        raise Exception
     else:
         return video_id
