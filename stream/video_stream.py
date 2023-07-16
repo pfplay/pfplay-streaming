@@ -1,4 +1,7 @@
 import os
+
+from fastapi import HTTPException
+
 from common import get_logger
 from download.video_download import download_video
 from convert.video_convert import convert_video
@@ -21,10 +24,10 @@ class StreamVideo:
             hls_file_path = f"{OUTPUT_VIDEO_DIRECTORY}/{video_id}/{video_id}.{OUTPUT_VIDEO_FORMAT}"
 
             if not os.path.isfile(hls_file_path):
-                raise Exception(f"HLS File not found: {hls_file_path}")
+                raise FileNotFoundError(f"HLS File not found: {hls_file_path}")
 
             return hls_file_path
 
         except Exception as ex:
             logger.error(ex)
-            raise ex
+            raise HTTPException(status_code=500, detail=str(ex))

@@ -18,8 +18,12 @@ def convert_video(video_id):
     if os.path.exists(output_dir):
         pass # skip
     else:
-        subprocess.run(f'mkdir -p {output_dir}', shell=True)
-        input_stream = ffmpeg.input(input_file, f=INPUT_VIDEO_FORMAT)
-        output_stream = ffmpeg.output(input_stream, output_file, format='hls',
-                                      start_number=0, hls_time=5, hls_list_size=0)
-        ffmpeg.run(output_stream)
+        try:
+            subprocess.run(f'mkdir -p {output_dir}', shell=True, check=True)
+            input_stream = ffmpeg.input(input_file, f=INPUT_VIDEO_FORMAT)
+            output_stream = ffmpeg.output(input_stream, output_file, format='hls',
+                                          start_number=0, hls_time=5, hls_list_size=0)
+            ffmpeg.run(output_stream, overwrite_output=True)
+        except Exception as ex:
+            print("An error occurred while converting the video: ", ex)
+            raise ex
