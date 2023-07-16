@@ -10,7 +10,7 @@ from download.models import DownloadVideoDto
 from download.video_download import download_video
 from resources import secret
 from search.video_search import search_videos
-from stream.video_stream import stream_video
+from stream.video_stream import StreamVideo
 
 app = FastAPI()
 app.add_middleware(
@@ -64,10 +64,11 @@ async def convert(convert_video_dto: ConvertVideoDto):
         logger.error(ex)
         return {"message": "error", "data": ""}
 
+
 @app.get("/streaming/{video_id}/", dependencies=[Depends(check_apikey)])
 async def stream(video_id: str):
     try:
-        hls_file_path = stream_video.download_and_convert(video_id)
+        hls_file_path = StreamVideo.download_and_convert(video_id)
         return {"message": "success", "data": hls_file_path}
 
     except Exception as ex:

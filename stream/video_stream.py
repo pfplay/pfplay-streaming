@@ -10,7 +10,8 @@ OUTPUT_VIDEO_DIRECTORY = VideoConvertConfig.CONVERTED_VIDEO_OUTPUT_DIRECTORY_LOC
 
 logger = get_logger()
 
-class stream_video:
+
+class StreamVideo:
     @staticmethod
     def download_and_convert(video_id: str):
         try:
