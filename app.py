@@ -8,7 +8,6 @@ from convert.models import ConvertVideoDto
 from convert.video_convert import convert_video
 from download.models import DownloadVideoDto
 from download.video_download import download_video
-from resources import secret
 from search.video_search import search_videos
 
 app = FastAPI()
@@ -26,10 +25,14 @@ async def check_apikey(
         api_key: Annotated[str | None, Header(convert_underscores=False)] = None,
         api_secret: Annotated[str | None, Header(convert_underscores=False)] = None,
 ):
-    if api_key != secret.API_KEY:
-        raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
-    if api_secret != secret.API_SECRET:
-        raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
+    # TODO : The following block needed to be deprecated. 
+    #   We need uniformed Auth service with JAVA implementation
+    
+    # if api_key != secret.API_KEY:
+    #     raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
+    # if api_secret != secret.API_SECRET:
+    #     raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
+    pass
 
 
 @app.get("/hello")
