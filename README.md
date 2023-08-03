@@ -30,8 +30,15 @@ docker build -t pfplay-streaming .
 ```
 4. Execute the image on the port as you want 
 ```bash
-docker run --name pfplay-streaming -p 9000:9000 pystreaming
+docker run -d --name pfplay-streaming -p 9000:9000 pystreaming
 ```
+You might want to check if app is running correctly.
+```bash
+curl http://0.0.0.0:9000/hello
+
+> {"message":"OK"}
+```
+
 5. When you're done with testing, stop the docker image
 ```bash
 docker stop pystreaming
