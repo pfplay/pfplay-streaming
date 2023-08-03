@@ -26,15 +26,23 @@ PFPlay-streaming is a dedicated service to serve streaming jobs from external so
 2. Make sure Docker client is running on the local
 3. Run the following command to build a local image
 ```bash
-docker build --progress=plain -t pystreaming .
+docker build -t pfplay-streaming .
 ```
 4. Execute the image on the port as you want 
 ```bash
-docker run --name pystreaming -p 9000:9000 pystreaming
+docker run --name pfplay-streaming -p 9000:9000 pystreaming
 ```
-5. When you want to clean up the images, the commended approach for the local is to sweep all the cached images.
+5. When you're done with testing, stop the docker image
+```bash
+docker stop pystreaming
 ```
-docker container prune -f 
+6. Whenever you feel like starting the image again, you can start the image
+```bash
+docker start pystreaming
+```
+7. We should prune the image if you want to re-build the image in case any updates on the FastAPI or the image.
+```bash
+docker container prune -f
 ```
 
 </details>

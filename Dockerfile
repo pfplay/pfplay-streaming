@@ -1,24 +1,29 @@
+FROM python:3.11-slim as build-stage
+
+WORKDIR /tmp
+
+RUN pip install poetry
+COPY ./pyproject.toml ./poetry.lock* /tmp/
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+# 
 FROM python:3.11-slim
 
-ARG DIR_SERVICE=/usr/services
+ARG DIR_SERVICE=/opt/service
 
 LABEL owner="pfplay-backend"
 LABEL description="PFPlay-Streaming Python"
+ENV ROLE pfplay-streaming
 
 WORKDIR ${DIR_SERVICE}
 
-RUN pip install --upgrade pip
+COPY --from=build-stage /tmp/requirements.txt ${DIR_SERVICE}/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r ${DIR_SERVICE}/requirements.txt
 
-RUN pip install -U poetry==1.4.2
-
-COPY . ${DIR_SERVICE}/
-
-RUN poetry --version
-
-RUN cd ${DIR_SERVICE}/
-
-RUN poetry install 
+COPY . ${DIR_SERVICE}
 
 EXPOSE 9000
 
-CMD ["poetry", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9000"]
+# Not leveraging bash script at the moment until we have useful booting logics
+# ENTRYPOINT ["sh", "/opt/service/run.sh"]
+CMD uvicorn app:app --host 0.0.0.0 --port 9000
