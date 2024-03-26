@@ -133,5 +133,5 @@ resources/converted
 resources/secret.py
 .idea
 
-./config/.env
+./.env
 poetry.sh
