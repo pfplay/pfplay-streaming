@@ -132,3 +132,6 @@ resources/videos
 resources/converted
 resources/secret.py
 .idea
+
+./config/.env
+poetry.sh
