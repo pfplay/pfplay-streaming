@@ -1,7 +1,6 @@
 import os
 
 import uvicorn
-import traceback
 from typing import Annotated
 
 import dotenv
@@ -51,7 +50,6 @@ async def search(query: str, rows: int = 50, limit_video_length: int = -1):
         return {"message": "success", "data": data}
     except Exception as ex:
         logger.error(ex)
-        traceback.format_exc()
         return {"message": "error", "data": ""}
 
 
