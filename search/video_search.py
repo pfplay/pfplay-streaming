@@ -11,26 +11,9 @@ from common import get_logger
 logger = get_logger()
 
 
-async def search_videos(query, rows, limit_video_length):
-    search_results = await YoutubeSearch(query, rows, limit_video_length).results
+async def search_videos(query, rows):
+    search_results = await YoutubeSearch(query, rows).results
     return search_results
-
-
-async def async_is_available_video(running_time, limit_video_length):
-    # Live Video
-    if running_time is None:
-        return False
-
-    if limit_video_length < 0:
-        return True
-
-    i = 0
-    run_sec = 0
-    for sec in reversed(running_time.split(':')):
-        run_sec += int(sec) * 60 ** i
-        i += 1
-
-    return not (run_sec > limit_video_length)
 
 
 async def _execute_async_request(
@@ -54,10 +37,9 @@ async def _execute_async_request(
 
 
 class YoutubeSearch(Search):
-    def __init__(self, query, rows, limit_video_length):
+    def __init__(self, query, rows):
         super().__init__(query)
         self.rows = rows
-        self.limit_video_length = limit_video_length
         self._innertube_client = AsyncInnerTube(client='WEB')
 
     @property
@@ -182,8 +164,7 @@ class YoutubeSearch(Search):
                     'thumbnail_url': vid_thumbnail_url
                 }
 
-                if await async_is_available_video(vid_length, self.limit_video_length):
-                    videos.append(vid_metadata)
+                videos.append(vid_metadata)
 
                 if len(videos) >= self.rows:
                     break

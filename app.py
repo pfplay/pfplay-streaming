@@ -5,7 +5,6 @@ from typing import Annotated
 
 import dotenv
 from fastapi import FastAPI, Header, HTTPException, Depends
-from fastapi.security import APIKeyHeader
 from starlette.middleware.cors import CORSMiddleware
 
 from common import get_logger
@@ -20,8 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 logger = get_logger()
-apikey = APIKeyHeader(name="X-API-KEY")
-apisecret = APIKeyHeader(name="X-API-SECRET")
 ENV_PATH = os.environ.get('env_path')
 dotenv.load_dotenv(ENV_PATH)
 
@@ -35,7 +32,6 @@ def check_apikey(
         raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
     if X_API_SECRET != os.environ.get('API_SECRET'):
         raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
-    pass
 
 
 @app.get("/hello")
@@ -44,9 +40,9 @@ def health_check():
 
 
 @app.get("/api/v1/video/search", dependencies=[Depends(check_apikey)])
-async def search(query: str, rows: int = 50, limit_video_length: int = -1):
+async def search(query: str, rows: int = 50):
     try:
-        data = await search_videos(query, rows, limit_video_length)
+        data = await search_videos(query, rows)
         return {"message": "success", "data": data}
     except Exception as ex:
         logger.error(ex)
@@ -55,4 +51,3 @@ async def search(query: str, rows: int = 50, limit_video_length: int = -1):
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=9000, workers=1)
-
