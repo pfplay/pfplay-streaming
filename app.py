@@ -1,13 +1,13 @@
+import os
+
+import uvicorn
 from typing import Annotated
 
+import dotenv
 from fastapi import FastAPI, Header, HTTPException, Depends
 from starlette.middleware.cors import CORSMiddleware
 
 from common import get_logger
-from convert.models import ConvertVideoDto
-from convert.video_convert import convert_video
-from download.models import DownloadVideoDto
-from download.video_download import download_video
 from search.video_search import search_videos
 
 app = FastAPI()
@@ -19,49 +19,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 logger = get_logger()
+ENV_PATH = os.environ.get('env_path')
+dotenv.load_dotenv(ENV_PATH)
 
 
-async def check_apikey(
-        api_key: Annotated[str | None, Header(convert_underscores=False)] = None,
-        api_secret: Annotated[str | None, Header(convert_underscores=False)] = None,
+def check_apikey(
+        X_API_KEY: Annotated[str | None, Header(convert_underscores=False)] = None,
+        X_API_SECRET: Annotated[str | None, Header(convert_underscores=False)] = None,
 ):
-    # TODO : The following block needed to be deprecated. 
-    #   We need uniformed Auth service with JAVA implementation
-    
-    # if api_key != secret.API_KEY:
-    #     raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
-    # if api_secret != secret.API_SECRET:
-    #     raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
-    pass
+
+    if X_API_KEY != os.environ.get('API_KEY'):
+        raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
+    if X_API_SECRET != os.environ.get('API_SECRET'):
+        raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
 
 
 @app.get("/hello")
-async def health_check():
+def health_check():
     return {"message": "OK"}
 
 
-@app.get("/video/search", dependencies=[Depends(check_apikey)])
-async def search(query: str, rows: int = 10):
+@app.get("/api/v1/video/search", dependencies=[Depends(check_apikey)])
+async def search(query: str, rows: int = 50):
     try:
-        return {"message": "success", "data": search_videos(query, rows)}
+        data = await search_videos(query, rows)
+        return {"message": "success", "data": data}
     except Exception as ex:
         logger.error(ex)
         return {"message": "error", "data": ""}
 
 
-@app.post("/video/download", dependencies=[Depends(check_apikey)])
-async def download(download_video_dto: DownloadVideoDto):
-    try:
-        return {"message": "success", "data": download_video(video_id=download_video_dto.video_id)}
-    except Exception as ex:
-        logger.error(ex)
-        return {"message": "error", "data": ""}
-
-
-@app.post("/video/convert", dependencies=[Depends(check_apikey)])
-async def convert(convert_video_dto: ConvertVideoDto):
-    try:
-        return {"message": "success", "data": convert_video(video_id=convert_video_dto.video_id)}
-    except Exception as ex:
-        logger.error(ex)
-        return {"message": "error", "data": ""}
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=9000, workers=1)
