@@ -3,10 +3,11 @@ import time
 from urllib import parse
 
 import aiohttp
-from pytube import Search
+from pytube import Search, YouTube
 from pytube.innertube import InnerTube, _client_id, _client_secret
 
 from common import get_logger
+from model.models import Video
 
 logger = get_logger()
 
@@ -14,6 +15,33 @@ logger = get_logger()
 async def search_videos(query, rows):
     search_results = await YoutubeSearch(query, rows).results
     return search_results
+
+
+async def fetch_videos(url):
+    fetched_video = YouTube(url)
+
+    video_id = fetched_video.video_id
+    video_title = fetched_video.title
+    watch_url = fetched_video.watch_url
+    embed_url = fetched_video.embed_url
+    author = fetched_video.author
+    running_time = _get_running_time(fetched_video.length)
+    thumbnail_url = fetched_video.thumbnail_url
+
+    return Video(
+        video_id=video_id,
+        video_title=video_title,
+        watch_url=watch_url,
+        embed_url=embed_url,
+        author=author,
+        running_time=running_time,
+        thumbnail_url=thumbnail_url
+    )
+
+def _get_running_time(length_seconds):
+    minute = int(length_seconds) / 60
+    second = int(length_seconds) - (60 * minute)
+    return "{}:{:02d}".format(int(minute), int(second))
 
 
 async def _execute_async_request(
