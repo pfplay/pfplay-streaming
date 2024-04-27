@@ -5,10 +5,11 @@ from typing import Annotated
 
 import dotenv
 from fastapi import FastAPI, Header, HTTPException, Depends
+from pytube import YouTube
 from starlette.middleware.cors import CORSMiddleware
 
 from common import get_logger
-from search.video_search import search_videos
+from search.video_search import search_videos, fetch_videos
 
 app = FastAPI()
 app.add_middleware(
@@ -43,6 +44,16 @@ def health_check():
 async def search(query: str, rows: int = 50):
     try:
         data = await search_videos(query, rows)
+        return {"message": "success", "data": data}
+    except Exception as ex:
+        logger.error(ex)
+        return {"message": "error", "data": ""}
+
+
+@app.get("/api/v1/video/fetch", dependencies=[Depends(check_apikey)])
+async def fetch(url: str):
+    try:
+        data = await fetch_videos(url)
         return {"message": "success", "data": data}
     except Exception as ex:
         logger.error(ex)
