@@ -54,7 +54,7 @@ async def search(query: str, rows: int = 50):
 async def fetch(url: str):
     try:
         data = await fetch_videos(url)
-        return {"message": "success", "data": data}
+        return {"message": "success", "data": [data]}
     except Exception as ex:
         logger.error(ex)
         return {"message": "error", "data": ""}
