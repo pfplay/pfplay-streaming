@@ -25,13 +25,12 @@ dotenv.load_dotenv(ENV_PATH)
 
 
 def check_apikey(
-        X_API_KEY: Annotated[str | None, Header(convert_underscores=False)] = None,
-        X_API_SECRET: Annotated[str | None, Header(convert_underscores=False)] = None,
+        api_key: Annotated[str | None, Header(alias="X-Api-Key")] = None,
+        api_secret: Annotated[str | None, Header(alias="X-Api-Secret")] = None,
 ):
-
-    if X_API_KEY != os.environ.get('API_KEY'):
+    if api_key != os.environ.get('API_KEY'):
         raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
-    if X_API_SECRET != os.environ.get('API_SECRET'):
+    if api_secret != os.environ.get('API_SECRET'):
         raise HTTPException(status_code=401, detail="Unauthorized api key, secret")
 
 
